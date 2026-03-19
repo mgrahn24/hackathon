@@ -1,6 +1,8 @@
 import os
+import json
 import logging
 import smtplib
+from datetime import date
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
@@ -8,6 +10,21 @@ from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", "..", ".env"))
 
 log = logging.getLogger(__name__)
+
+CONTRACTS_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "Contracts")
+
+
+def _mark_email_sent(source_file: str):
+    path = os.path.join(CONTRACTS_DIR, source_file)
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        data["audit_email_sent"] = date.today().isoformat()
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        log.info("Flagged audit_email_sent in %s", source_file)
+    except Exception as e:
+        log.error("Failed to flag audit_email_sent in %s: %s", source_file, e)
 
 
 def send_audit_email(
@@ -78,6 +95,7 @@ This is an automated notification.
             server.sendmail(sender, to_email, msg.as_string())
         result = f"Email sent to {to_email} for contract '{supplier_name}'."
         log.info(result)
+        _mark_email_sent(source_file)
         return result
     except Exception as e:
         result = f"Failed to send email to {to_email}: {e}"

@@ -56,6 +56,10 @@ def get_contracts_due_for_audit() -> list[dict]:
             log.warning("Skipping %s — missing valid_to or termination (valid_to=%r, termination=%r)", fname, valid_to, termination)
             continue
 
+        if data.get("audit_email_sent"):
+            log.info("Skipping %s — audit email already sent", fname)
+            continue
+
         try:
             end_date = date.fromisoformat(valid_to)
             delta = _parse_termination(termination)
@@ -70,7 +74,7 @@ def get_contracts_due_for_audit() -> list[dict]:
             json.dump(data, f, indent=2, ensure_ascii=False)
         log.info("%s — valid_to=%s, termination=%s, audit_date=%s, due=%s", fname, valid_to, termination, audit_date, today == audit_date)
 
-        if today == audit_date:
+        if today >= audit_date:
             due.append({**data, "source_file": fname})
 
     log.info("Contracts due for audit: %d", len(due))
