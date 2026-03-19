@@ -70,9 +70,7 @@ This is an automated notification.
     msg.attach(MIMEText(body, "plain"))
 
     try:
-        log.debug("Connecting to %s:%s", smtp_host, smtp_port)
         with smtplib.SMTP(smtp_host, smtp_port) as server:
-            server.set_debuglevel(1)
             server.ehlo()
             server.starttls()
             server.ehlo()

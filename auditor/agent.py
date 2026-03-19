@@ -1,39 +1,7 @@
-from google.adk.agents import Agent, LlmAgent
-from google.adk.tools import google_search
+from google.adk.agents import Agent
 from .tools.contract_checker import get_contracts_due_for_audit
 from .tools.email_sender import send_audit_email
-
-search_agent = LlmAgent(
-    name="supplier_researcher",
-    model="gemini-2.5-flash",
-    description="Searches the web for alternative suppliers given a service description. Returns a plain-text summary of up to 5 alternatives including estimated cost, contract terms, and termination period.",
-    instruction="""
-You research alternative suppliers for a given service or product.
-
-When given a description of what a current supplier provides, search for up to 5 alternative
-suppliers that offer the same or equivalent service. For each alternative gather:
-  - Supplier name and website
-  - Estimated cost or pricing model (if publicly available)
-  - Typical contract terms (e.g. annual, monthly)
-  - Typical termination/notice period
-  - Any notable strengths or differentiators
-
-Run multiple searches as needed. Search in the same country/region as the current supplier where possible.
-
-Return a formatted plain-text summary like:
-
-  1. Supplier Name (website.com)
-     Cost: ~X per month / year
-     Terms: Annual contract
-     Termination: 3 months notice
-     Notes: Market leader in X, SOC2 certified
-
-  2. ...
-
-If pricing is not publicly available, note that and include what is known.
-""",
-    tools=[google_search],
-)
+from .tools.search import search_alternative_suppliers
 
 INSTRUCTION = """
 You are a contract audit agent. You run daily to check whether any contracts are due for review.
@@ -44,17 +12,24 @@ Follow these steps:
 
 2. For each contract returned:
 
-   a. **Research alternatives**: Transfer to the supplier_researcher agent, providing the
-      contract's description_supplier, category_description, and supplier_name so it can
-      find up to 5 alternative suppliers with cost, terms, and termination details.
+   a. **Research alternatives**: Call search_alternative_suppliers() with a query based on
+      the contract's description_supplier, category_description, and supplier_name.
+      Run 2-3 searches with different queries to find up to 5 distinct alternative suppliers.
+      For each alternative extract: name, website, estimated cost, contract terms,
+      termination period, and any notable strengths.
 
-   b. **Send email**: Once the research is returned, call send_audit_email() with:
-        - to_email: the contract's responsible_email
-        - supplier_name: the contract's supplier_name
-        - valid_to: the contract's valid_to
-        - audit_date: the contract's audit_date
-        - source_file: the contract's source_file
-        - alternatives_summary: the plain-text summary returned by the researcher
+   b. **Format alternatives** as a plain-text summary:
+
+        1. Supplier Name (website.com)
+           Cost: ~X per month / year
+           Terms: Annual contract
+           Termination: 3 months notice
+           Notes: Notable differentiator
+
+        2. ...
+
+   c. **Send email**: Call send_audit_email() with the contract's responsible_email,
+      supplier_name, valid_to, audit_date, source_file, and the formatted alternatives_summary.
 
 3. Summarise what was done: contracts checked, notifications sent, suppliers researched.
 
@@ -65,11 +40,10 @@ Important rules:
 - Never modify contract data.
 """
 
-root_agent = LlmAgent(
+root_agent = Agent(
     name="contract_auditor",
     model="gemini-2.5-flash",
     instruction=INSTRUCTION,
     description="Daily agent that checks contract audit dates, researches alternative suppliers, and emails responsible persons when review is due.",
-    tools=[get_contracts_due_for_audit, send_audit_email],
-    sub_agents=[search_agent],
+    tools=[get_contracts_due_for_audit, send_audit_email, search_alternative_suppliers],
 )

@@ -8,7 +8,8 @@
       "Bash(python -c \"from auditor.agent import root_agent; print\\(''Auditor loaded:'', root_agent.name\\)\")",
       "Bash(python -c \"from auditor.agent import root_agent; print\\(''OK:'', root_agent.name, ''| tools:'', [t.__name__ if hasattr\\(t, ''__name__''\\) else str\\(t\\) for t in root_agent.tools]\\)\")",
       "Bash(python -c \"from auditor.agent import root_agent; print\\(''OK:'', root_agent.name\\)\")",
-      "Bash(pip install:*)"
+      "Bash(pip install:*)",
+      "Bash(python -c \"from auditor.agent import root_agent; print\\(''OK:'', root_agent.name, ''| tools:'', [t.__name__ for t in root_agent.tools]\\)\")"
     ]
   }
 }

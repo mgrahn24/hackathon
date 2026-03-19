@@ -4,8 +4,8 @@ import asyncio
 import logging
 
 logging.basicConfig(
-    level=logging.DEBUG,
-    format="%(asctime)s %(levelname)-8s %(name)s — %(message)s",
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s — %(message)s",
 )
 
 from google.adk.runners import Runner
