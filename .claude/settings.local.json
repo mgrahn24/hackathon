@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(source .venv/Scripts/activate)",
+      "Bash(python -c \"from assistant.agent import root_agent; print\\(''Agent loaded:'', root_agent.name\\); print\\(''Tools:'', [t.__name__ for t in root_agent.tools]\\)\")"
+    ]
+  }
+}
