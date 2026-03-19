@@ -2,7 +2,13 @@
   "permissions": {
     "allow": [
       "Bash(source .venv/Scripts/activate)",
-      "Bash(python -c \"from assistant.agent import root_agent; print\\(''Agent loaded:'', root_agent.name\\); print\\(''Tools:'', [t.__name__ for t in root_agent.tools]\\)\")"
+      "Bash(python -c \"from assistant.agent import root_agent; print\\(''Agent loaded:'', root_agent.name\\); print\\(''Tools:'', [t.__name__ for t in root_agent.tools]\\)\")",
+      "Bash(python -c \"import dateutil; print\\(''dateutil ok''\\)\")",
+      "Bash(pip show:*)",
+      "Bash(python -c \"from auditor.agent import root_agent; print\\(''Auditor loaded:'', root_agent.name\\)\")",
+      "Bash(python -c \"from auditor.agent import root_agent; print\\(''OK:'', root_agent.name, ''| tools:'', [t.__name__ if hasattr\\(t, ''__name__''\\) else str\\(t\\) for t in root_agent.tools]\\)\")",
+      "Bash(python -c \"from auditor.agent import root_agent; print\\(''OK:'', root_agent.name\\)\")",
+      "Bash(pip install:*)"
     ]
   }
 }

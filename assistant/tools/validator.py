@@ -1,17 +1,16 @@
 REQUIRED_FIELDS = [
-    "audit_date",
+    "contract_value",
     "responsible",
-    "contract_value_per_year",
     "category_description",
-    "gina_account",
-    "amount_description",
+    "account_description",
     "suppliers",
     "supplier_name",
     "description_supplier",
     "owner_gt",
-    "department",
+    "termination",
     "valid_from",
     "valid_to",
+    "ongoing",
 ]
 
 
